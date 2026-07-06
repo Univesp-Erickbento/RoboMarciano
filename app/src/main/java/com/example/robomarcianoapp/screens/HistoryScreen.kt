@@ -9,25 +9,22 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.example.robomarcianoapp.HistoryManager
+import java.net.URLEncoder
 
 @Composable
-fun HistoryScreen(
-    navController: NavController
-) {
+fun HistoryScreen(navController: NavController) {
 
-    // histórico simples em memória
-    val history = remember {
-        mutableStateListOf<String>()
-    }
+    val history = remember { HistoryManager.getAll() }
 
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp)
+            .padding(20.dp)
     ) {
 
         Text(
-            text = "Histórico de comandos",
+            text = "Histórico de comandos 📜",
             style = MaterialTheme.typography.titleLarge
         )
 
@@ -38,24 +35,31 @@ fun HistoryScreen(
         ) {
             items(history) { item ->
 
-                Text(
-                    text = item,
+                Card(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(12.dp)
+                        .padding(vertical = 6.dp)
                         .clickable {
 
-                            // reenviar mensagem para tela principal
-                            navController.navigate("main?msg=$item")
+                            val encoded = URLEncoder.encode(item, "UTF-8")
+                            navController.navigate("response/$encoded")
                         }
-                )
-
-                Divider()
+                ) {
+                    Text(
+                        text = item,
+                        modifier = Modifier.padding(16.dp)
+                    )
+                }
             }
         }
 
+        Spacer(modifier = Modifier.height(12.dp))
+
+        // 🔙 BOTÃO DE VOLTAR (QUE SUMIU)
         Button(
-            onClick = { navController.popBackStack() },
+            onClick = {
+                navController.popBackStack()
+            },
             modifier = Modifier.fillMaxWidth()
         ) {
             Text("Voltar")

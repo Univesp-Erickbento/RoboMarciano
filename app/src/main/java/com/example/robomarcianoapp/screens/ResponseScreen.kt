@@ -6,7 +6,8 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.example.robomarcianoapp.MartianRobot
+import com.example.robomarcianoapp.MarcianoPremium
+import java.net.URLDecoder
 
 @Composable
 fun ResponseScreen(
@@ -14,12 +15,19 @@ fun ResponseScreen(
     navController: NavController
 ) {
 
-    // ✔ cria o robô uma única vez
-    val robot = remember { MartianRobot() }
+    // decodifica a mensagem (IMPORTANTE)
+    val decodedMessage = remember(message) {
+        URLDecoder.decode(message, "UTF-8")
+    }
 
-    // ✔ calcula resposta baseada na mensagem
-    val response = remember(message) {
-        robot.responder(message)
+    val robot = remember {
+        MarcianoPremium {
+            "Ação personalizada"
+        }
+    }
+
+    val response = remember(decodedMessage) {
+        robot.responda(decodedMessage)
     }
 
     Column(
@@ -41,7 +49,6 @@ fun ResponseScreen(
             Column(
                 modifier = Modifier.padding(16.dp)
             ) {
-
                 Text(
                     text = response,
                     style = MaterialTheme.typography.bodyLarge
@@ -54,12 +61,10 @@ fun ResponseScreen(
         Button(
             onClick = {
 
-                // ✔ avisa MainScreen para limpar campo
                 navController.previousBackStackEntry
                     ?.savedStateHandle
                     ?.set("clear", true)
 
-                // ✔ volta para tela principal
                 navController.popBackStack()
             },
             modifier = Modifier.fillMaxWidth()

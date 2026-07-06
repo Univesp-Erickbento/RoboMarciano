@@ -9,6 +9,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.example.robomarcianoapp.HistoryManager
+import java.net.URLEncoder
 
 @Composable
 fun MainScreen(navController: NavController) {
@@ -18,7 +20,7 @@ fun MainScreen(navController: NavController) {
     val context = LocalContext.current
     val savedStateHandle = navController.currentBackStackEntry?.savedStateHandle
 
-    // ✅ LIMPA QUANDO VOLTA DA TELA DE RESPOSTA
+    // 🔄 limpa campo ao voltar da ResponseScreen
     LaunchedEffect(savedStateHandle) {
         val shouldClear = savedStateHandle?.get<Boolean>("clear")
 
@@ -50,17 +52,27 @@ fun MainScreen(navController: NavController) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // 🤖 ENVIAR PARA O ROBÔ
+        // 🤖 ENVIAR AO ROBÔ
         Button(
             onClick = {
+
                 if (mensagem.isBlank()) {
+
                     Toast.makeText(
                         context,
                         "Escreva uma mensagem para o Marciano",
                         Toast.LENGTH_SHORT
                     ).show()
+
                 } else {
-                    navController.navigate("response/$mensagem")
+
+                    // ✔ salva no histórico
+                    HistoryManager.add(mensagem)
+
+                    // ✔ protege caracteres especiais
+                    val encoded = URLEncoder.encode(mensagem, "UTF-8")
+
+                    navController.navigate("response/$encoded")
                 }
             },
             modifier = Modifier.fillMaxWidth()
